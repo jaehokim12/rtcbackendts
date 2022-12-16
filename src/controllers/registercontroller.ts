@@ -5,7 +5,6 @@ export const registerController = async (req: Request, res: Response, next: Next
     try {
         await registerService(req, res);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: error });
     }
     next();

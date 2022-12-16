@@ -11,16 +11,14 @@ interface UserInfo {
 
 export const registerService = async (req: Request, res: Response) => {
     try {
-        console.log('req', req);
         const { username, mail, password } = req.body as UserInfo;
         let userExist = await registerDao.registerDao({ mail });
         if (userExist) {
-            console.log('userExist', userExist);
             return res.status(200).send('already email exist');
         }
         const encryptedPassword = await hash(password, 10);
         let result = await registerDao.registerDaoinsert({ username, mail, encryptedPassword });
-        console.log('result', result);
+
         const token = jwt.sign(
             {
                 userId: username,

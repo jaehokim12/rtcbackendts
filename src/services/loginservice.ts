@@ -6,31 +6,31 @@ import jwt from 'jsonwebtoken';
 import { loginDao } from '../dao/loginDao';
 interface UserInfo {
     mail: string;
-    passwords: string;
+    password: string;
     token?: string;
 }
 interface dbUserData {
-    Username: string;
-    Email: string;
-    Passwd: string;
+    dusername: string;
+    dmail: string;
+    dpassword: string;
 }
 export const loginService = async (req: Request, res: Response) => {
+    console.log('reqbody', req.body);
     try {
-        const { mail, passwords } = req.body as UserInfo;
+        const { mail, password } = req.body;
         let userData: dbUserData = await loginDao(mail);
-        const { Username, Email, Passwd } = userData;
-        console.log('userData', Email);
-        console.log('userData', Passwd);
-        console.log('userData', Username);
+        console.log('userdata', userData);
+        const { dusername, dmail, dpassword } = userData;
+
         // res.send();
 
-        const comparepasswd = await bcrypt.compare(passwords, userData.Passwd);
+        const comparepasswd = await bcrypt.compare(password, userData.dpassword);
         console.log('comparepasswd', comparepasswd);
         if (userData && comparepasswd) {
             console.log('userdatauserdata', userData);
             const token = jwt.sign(
                 {
-                    userId: Username,
+                    userId: dusername,
                     mail,
                 },
 
@@ -43,9 +43,9 @@ export const loginService = async (req: Request, res: Response) => {
 
             return res.status(200).send({
                 data: {
-                    mail: userData.Email,
+                    mail: userData.dmail,
                     token: token,
-                    username: userData.Username,
+                    username: userData.dusername,
                 },
             });
         }

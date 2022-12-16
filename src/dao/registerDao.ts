@@ -21,6 +21,6 @@ export const registerDao = async ({ mail }: UserInfo) => {
 
 export const registerDaoinsert = async ({ username, mail, encryptedPassword }: UserInfos) => {
     let result = await database.promisePool.query(`${registerQuery.insertUser}`, [username, mail, encryptedPassword]);
-    console.log('result', result);
+
     return result;
 };

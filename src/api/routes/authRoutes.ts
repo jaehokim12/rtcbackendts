@@ -7,7 +7,6 @@ const router = express.Router();
 router.post('/register', authControllers.registerController);
 router.post('/login', authControllers.loginController);
 router.get('/tests', (req, res) => {
-    console.log('reqbody');
     res.send('request tests');
 });
 router.get('/test', auth, (req, res) => {

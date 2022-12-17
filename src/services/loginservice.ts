@@ -14,8 +14,13 @@ interface dbUserData {
     dmail: string;
     dpassword: string;
 }
+interface dUserInfo {
+    username: string;
+    mail: string;
+    password: string;
+}
 export const loginService = async (req: Request, res: Response) => {
-    console.log('reqbody', req.body);
+    console.log('reqbodyreqbody', req.body);
     try {
         const { mail, password } = req.body;
         let userData: dbUserData = await loginDao(mail);
@@ -28,6 +33,7 @@ export const loginService = async (req: Request, res: Response) => {
         console.log('comparepasswd', comparepasswd);
         if (userData && comparepasswd) {
             console.log('userdatauserdata', userData);
+            let userDetails;
             const token = jwt.sign(
                 {
                     userId: dusername,
@@ -40,16 +46,19 @@ export const loginService = async (req: Request, res: Response) => {
                     expiresIn: '24h',
                 },
             );
-
-            return res.status(200).send({
-                data: {
-                    mail: userData.dmail,
+            return res.send(
+                (userDetails = {
+                    mail: mail,
                     token: token,
-                    username: userData.dusername,
-                },
-            });
+                    username: dusername,
+                }),
+            );
         }
-
+        //  data: {
+        //             mail: userData.dmail,
+        //             token: token,
+        //             username: userData.dusername,
+        //         },
         return res.status(400).send('Invalid credentials. Please try again');
     } catch {
         return res.status(500).send('Something went wrong. Please try again');

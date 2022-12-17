@@ -18,7 +18,12 @@ export const registerService = async (req: Request, res: Response) => {
         }
         const encryptedPassword = await hash(password, 10);
         let result = await registerDao.registerDaoinsert({ username, mail, encryptedPassword });
-
+        interface IUserDetails {
+            mail: string;
+            token: string;
+            username: string;
+        }
+        let userDetails;
         const token = jwt.sign(
             {
                 userId: username,
@@ -32,11 +37,13 @@ export const registerService = async (req: Request, res: Response) => {
                 expiresIn: '24h',
             },
         );
-        return res.send({
-            mail: mail,
-            token: token,
-            username: username,
-        });
+        return res.send(
+            (userDetails = {
+                mail: mail,
+                token: token,
+                username: username,
+            }),
+        );
     } catch {
         return res.status(500).send('Something went wrong. Please try again');
     }

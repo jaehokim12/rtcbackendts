@@ -9,8 +9,7 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     }
     try {
         token = token.replace(/^Bearer\s+/, '');
-
-        const decoded = jwt.verify(token, `adfb!23`);
+        const decoded = jwt.verify(token, `${process.env.TOKEN_KEY}`);
         const decode = jwt.decode(token);
         req.body.user = decode;
     } catch (err) {

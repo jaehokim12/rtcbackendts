@@ -48,3 +48,4 @@ export const registerService = async (req: Request, res: Response) => {
         return res.status(500).send('Something went wrong. Please try again');
     }
 };
+export default registerService;

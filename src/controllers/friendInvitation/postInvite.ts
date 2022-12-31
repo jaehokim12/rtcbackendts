@@ -1,55 +1,54 @@
-// const User = require("../../models/user");
-// const FriendInvitation = require("../../models/friendInvitation");
-// const friendsUpdates = require("../../socketHandlers/updates/friends");
+// import { updateFriendsPendingInvitations } from '../../socketHandlers/updates/friends';
+import { friendDao } from '../../dao/friendDao';
+import { friendInviteListDao } from '../../dao/friendInviteListDao';
+import { friendStateDao } from '../../dao/friendStateDao';
+import { friendInviteDao } from '../../dao/friendInviteDao';
+import { Request, Response } from 'express';
+import { friendCheckDao } from '../../dao/friendCheckDao';
+export const postInvite = async (req: Request, res: Response) => {
+    try {
+        const { targetMailAddress } = req.body;
+        const { userId, mail } = req.user;
 
-export const postInvite = async (req, res) => {
-    const { targetMailAddress } = req.body;
+        if (mail.toLowerCase() === targetMailAddress.toLowerCase()) {
+            return res.status(409).send('Sorry. You cannot become friend with yourself');
+        }
+        // todo find User tosenduser
+        const targetUser = await friendDao(targetMailAddress);
 
-    const { userId, mail } = req.user;
+        if (targetUser === undefined) {
+            // console.log('dfadsf');
+            return res
+                .status(404)
+                .send(`Friend of ${targetMailAddress} has not been found. Please check mail address.`);
+        }
 
-    // check if friend that we would like to invite is not user
+        // // check if invitation has been already sent
+        // const invitationAlreadyReceived = await FriendInvitation.findOne({
+        //     senderId: userId,
+        //     receiverId: targetUser._id,
+        // });
 
-    if (mail.toLowerCase() === targetMailAddress.toLowerCase()) {
-        return res.status(409).send('Sorry. You cannot become friend with yourself');
+        const invitationAlreadyReceived = await friendStateDao(userId, targetUser);
+
+        if (invitationAlreadyReceived !== undefined || invitationAlreadyReceived === 'pending') {
+            return res.status(409).send('Invitation has been already sent');
+        }
+
+        const usersAlreadyFriends = await friendCheckDao(userId, targetUser);
+
+        if (usersAlreadyFriends !== undefined && usersAlreadyFriends === 'accept') {
+            return res.status(409).send('Friend already added. Please check friends list');
+        }
+
+        const newInvitation = await friendInviteDao(targetUser, userId);
+        // console.log('newInvitatiaon', newInvitation);
+        // // send pending invitations update to specific user
+        // updateFriendsPendingInvitations(targetUser);
+
+        return res.status(201).send('Invitation has been sent');
+    } catch (error) {
+        // console.log();
+        return res.send(200);
     }
-
-    const targetUser = await User.findOne({
-        mail: targetMailAddress.toLowerCase(),
-    });
-
-    if (!targetUser) {
-        return res.status(404).send(`Friend of ${targetMailAddress} has not been found. Please check mail address.`);
-    }
-
-    // check if invitation has been already sent
-    const invitationAlreadyReceived = await FriendInvitation.findOne({
-        senderId: userId,
-        receiverId: targetUser._id,
-    });
-
-    if (invitationAlreadyReceived) {
-        return res.status(409).send('Invitation has been already sent');
-    }
-
-    // check if the user whuch we would like to invite is already our friend
-    const usersAlreadyFriends = targetUser.friends.find(friendId => friendId.toString() === userId.toString());
-
-    if (usersAlreadyFriends) {
-        return res.status(409).send('Friend already added. Please check friends list');
-    }
-
-    // create new invitation in database
-    const newInvitation = await FriendInvitation.create({
-        senderId: userId,
-        receiverId: targetUser._id,
-    });
-
-    // if invtiation has been successfully created we would like to update friends invitations if other user is online
-
-    // send pending invitations update to specific user
-    friendsUpdates.updateFriendsPendingInvitations(targetUser._id.toString());
-
-    return res.status(201).send('Invitation has been sent');
 };
-
-module.exports = postInvite;

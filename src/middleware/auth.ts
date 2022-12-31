@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { NextFunction, Request, Response } from 'express';
+import * as express from 'express';
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    let token = req.body.token;
-    let user = req.body.user;
+const verifyToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    let token = req.body.token || req.query.token || req.headers['authorization'];
+
     if (!token) {
         return res.status(403).send('A token is required for authentication');
     }
@@ -11,7 +11,7 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
         token = token.replace(/^Bearer\s+/, '');
         const decoded = jwt.verify(token, `${process.env.TOKEN_KEY}`);
         const decode = jwt.decode(token);
-        req.body.user = decode;
+        req.user = decode;
     } catch (err) {
         return res.status(401).send('Invalid Token');
     }

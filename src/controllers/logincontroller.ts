@@ -4,7 +4,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
     try {
         await loginService(req, res);
     } catch (error) {
-        console.log('err', error);
+        // console.log('err', error);
         res.errored;
     }
     next();

@@ -20,19 +20,19 @@ interface dUserInfo {
     password: string;
 }
 export const loginService = async (req: Request, res: Response) => {
-    console.log('reqbodyreqbody', req.body);
+    // console.log('reqbodyreqbody', req.body);
     try {
         const { mail, password } = req.body;
         let userData: dbUserData = await loginDao(mail);
-        console.log('userdata', userData);
+        // console.log('userdata', userData);
         const { dusername, dmail, dpassword } = userData;
 
         // res.send();
 
         const comparepasswd = await bcrypt.compare(password, userData.dpassword);
-        console.log('comparepasswd', comparepasswd);
+        // console.log('comparepasswd', comparepasswd);
         if (userData && comparepasswd) {
-            console.log('userdatauserdata', userData);
+            // console.log('userdatauserdata', userData);
             let userDetails;
             const token = jwt.sign(
                 {
@@ -46,13 +46,13 @@ export const loginService = async (req: Request, res: Response) => {
                     expiresIn: '24h',
                 },
             );
-            return res.send(
-                (userDetails = {
+            return res.status(201).json({
+                userDetails: {
                     mail: mail,
                     token: token,
                     username: dusername,
-                }),
-            );
+                },
+            });
         }
         //  data: {
         //             mail: userData.dmail,

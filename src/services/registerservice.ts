@@ -37,13 +37,21 @@ export const registerService = async (req: Request, res: Response) => {
                 expiresIn: '24h',
             },
         );
-        return res.send(
-            (userDetails = {
+        // return res.send(
+        //     (userDetails = {
+        //         mail: mail,
+        //         token: token,
+        //         username: username,
+        //     }),
+        // );
+
+        return res.status(201).json({
+            userDetails: {
                 mail: mail,
                 token: token,
                 username: username,
-            }),
-        );
+            },
+        });
     } catch {
         return res.status(500).send('Something went wrong. Please try again');
     }

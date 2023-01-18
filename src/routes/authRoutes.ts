@@ -1,10 +1,12 @@
 import express, { Request, Response } from 'express';
-import authControllers from '../controllers';
-import auth from '../middleware/auth';
+import * as loginController from '../controllers/login';
+import * as registerController from '../controllers/register';
 
-const router = express.Router();
+export const router = express.Router();
 
-router.post('/register', authControllers.registerController);
-router.post('/login', authControllers.loginController);
-
-export default router;
+router.post('/register', registerController.register);
+router.post('/login', loginController.login);
+router.get('/test', (req, res) => {
+    console.log('test req', req);
+    res.send('test ok ');
+});

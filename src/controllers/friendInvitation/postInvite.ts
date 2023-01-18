@@ -1,21 +1,18 @@
 // import { updateFriendsPendingInvitations } from '../../socketHandlers/updates/friends';
-import { friendDao } from '../../dao/friendDao';
-import { friendInviteListDao } from '../../dao/friendInviteListDao';
-import { friendStateDao } from '../../dao/friendStateDao';
-import { friendInviteDao } from '../../dao/friendInviteDao';
+import * as friendDao from '../../dao/friend';
 import { Request, Response } from 'express';
-import { friendCheckDao } from '../../dao/friendCheckDao';
+import { updateFriendsPendingInvitations } from '../../socketHandlers/updates/friends';
 export const postInvite = async (req: Request, res: Response) => {
     try {
         const { targetMailAddress } = req.body;
         const { userId, mail } = req.user;
-
+        // userId == Inviter
         if (mail.toLowerCase() === targetMailAddress.toLowerCase()) {
             return res.status(409).send('Sorry. You cannot become friend with yourself');
         }
         // todo find User tosenduser
-        const targetUser = await friendDao(targetMailAddress);
-
+        const targetUser = await friendDao.findTarget(targetMailAddress);
+        console.log('targetuser', targetUser);
         if (targetUser === undefined) {
             // console.log('dfadsf');
             return res
@@ -29,22 +26,22 @@ export const postInvite = async (req: Request, res: Response) => {
         //     receiverId: targetUser._id,
         // });
 
-        const invitationAlreadyReceived = await friendStateDao(userId, targetUser);
+        const invitationAlreadySend = await friendDao.checkInviteAlready(userId, targetUser);
 
-        if (invitationAlreadyReceived !== undefined || invitationAlreadyReceived === 'pending') {
+        if (invitationAlreadySend === 'pending') {
             return res.status(409).send('Invitation has been already sent');
         }
 
-        const usersAlreadyFriends = await friendCheckDao(userId, targetUser);
+        const usersAlreadyFriends = await friendDao.checkFriend(userId, targetUser);
 
-        if (usersAlreadyFriends !== undefined && usersAlreadyFriends === 'accept') {
+        if (usersAlreadyFriends === 'accept') {
             return res.status(409).send('Friend already added. Please check friends list');
         }
 
-        const newInvitation = await friendInviteDao(targetUser, userId);
+        const newInvitation = await friendDao.Invite(targetUser, userId);
         // console.log('newInvitatiaon', newInvitation);
         // // send pending invitations update to specific user
-        // updateFriendsPendingInvitations(targetUser);
+        updateFriendsPendingInvitations(targetUser);
 
         return res.status(201).send('Invitation has been sent');
     } catch (error) {

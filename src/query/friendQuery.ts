@@ -10,7 +10,13 @@ export const findOnlyReceiverState = 'select state from Tinvite where receiver=?
 export const insertFriend = 'insert into Tinvite (receiver,sender,state) value(?,?,?)';
 
 export const findFriendList = 'select receiver from Tinvite where sender=? and state=? limit 1';
-export const findLastState = 'select state from Tinvite where receiver=? order by id desc limit 1';
-export const findInviteList = 'select sender from Tinvite where receiver=? and state=?';
+// export const findLastState = 'select state from Tinvite where receiver=? order by id desc limit 1';
+export const InviteList = 'select sender from Tinvite where receiver=? and state=? order by id desc limit 1';
 export const friendUpdate = 'select sender from Tinvite where receiver=? and state=?';
-export const deleteInvite = 'delete from Tinvite where receiver=? and sender=? and state = ? limit 1';
+// export const deleteInvite = 'delete from Tinvite where receiver=? and sender=? and state = ? limit 1';
+
+export const accept = 'insert into Tinviter (receiver,sender,state) value(?,?,?)';
+export const addFriend = 'insert into Tfriend (username,friendname) value(?,?)';
+export const checkFriend = 'select friendname from Tfriend where username=? and friendname=?';
+export const friendList = 'select friendname from Tfriend where username=?';
+export const deleteInvite = 'delete from Tinvite where sender=? and receiver=?';

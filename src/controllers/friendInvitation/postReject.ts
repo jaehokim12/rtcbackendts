@@ -23,4 +23,4 @@ export const postReject = async (req: Request, res: Response) => {
     }
 };
 
-module.exports = postReject;
+// module.exports = postReject;

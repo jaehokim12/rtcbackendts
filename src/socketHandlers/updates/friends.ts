@@ -1,7 +1,5 @@
 import { getSocketServerInstance, getActiveConnections } from '../../serverStore';
-import { friendInviteListDao } from '../../dao/friendInviteListDao';
-import { friendUpdateDao } from '../../dao/friendUpdateDao';
-import { friendLastStateDao } from '../../dao/friendLastStateDao';
+import * as friendDao from '../../dao/friend';
 export const updateFriendsPendingInvitations = async (userId: any) => {
     try {
         // todo 초대목록 list
@@ -9,7 +7,10 @@ export const updateFriendsPendingInvitations = async (userId: any) => {
         // const result = await friendLastStateDao(userId);
         // console.log('result state', result);
 
-        const pendingInvitations = await friendInviteListDao(userId);
+        // 불필요 수정
+        console.log('userId:::::::::::', userId);
+        const pendingInvitations = (await friendDao.friendInviteListDao(userId)) as any;
+        // 현재 보낸사람 반환 해줌 userId = 초대받은사람
         // pendingInvitations => sender list []
 
         console.log('user invited lists :::: ', pendingInvitations);
@@ -18,14 +19,17 @@ export const updateFriendsPendingInvitations = async (userId: any) => {
         // 초대받은 사람의 socket에서 연결 갯수
         if (pendingInvitations !== undefined) {
             console.log('pendingInvitations !== undefined');
-            const io = getSocketServerInstance();
-            console.log('userid', userId);
-            // receiverList.forEach((receiverSocketId: any) => {
 
-            io.to(userId).emit('friends-invitations', {
-                pendingInvitations: pendingInvitations
-                    ? [{ id: 1, username: pendingInvitations.sender, mail: null }]
-                    : [],
+            console.log('userid:::', userId);
+            console.log('pendingInvitations:::', pendingInvitations.sender);
+            // receiverList.forEach((receiverSocketId: any) => {
+            const receiverList = getActiveConnections(userId);
+
+            const io = getSocketServerInstance();
+            receiverList.forEach((receiverSocketId: any) => {
+                io.to(receiverSocketId).emit('friends-invitations', {
+                    pendingInvitations: pendingInvitations ? pendingInvitations : [],
+                });
             });
         }
     } catch (err) {
@@ -49,18 +53,40 @@ export const updateFriends = async (userId: any) => {
         // console.log('receiverList', receiverList);
         // if (receiverList.length > 0) {
         // socket 중에서 친구 id 에게만 친구리스트 전달
-        const user = await friendUpdateDao(userId);
+        const receiverList = getActiveConnections(userId);
+        const user = await friendDao.friendList(userId);
+        console.log('user at check friendList', user);
 
+        if (receiverList.length > 0) {
+            if (user) {
+                const friendsList = user.map((f: any) => {
+                    console.log('ffff', f);
+                    return {
+                        // mail: f.mail,
+                        username: f.friendname,
+                    };
+                });
+                console.log('friendsList::::', friendsList);
+                // get io server instance
+                const io = getSocketServerInstance();
+
+                receiverList.forEach((receiverSocketId: any) => {
+                    io.to(receiverSocketId).emit('friends-list', {
+                        friends: friendsList ? friendsList : [],
+                    });
+                });
+            }
+        }
         // 수정 해야함
         // user =  only userid's friendUser(array)
         // console.log('useruseruseruser', user);
-        if (user) {
-            const friend = user.sender as any;
-            console.log('friends as receiver', friend);
-            const io = getSocketServerInstance();
-            const val = getActiveConnections(userId);
-            io.to(val).emit('friends-list', { friends: friend });
-        }
+        // if (user) {
+        //     const friend = user.sender as any;
+        //     console.log('friends as receiver', friend);
+        //     const io = getSocketServerInstance();
+        //     const val = getActiveConnections(userId);
+        //     io.to(val).emit('friends-list', { friends: friend });
+        // }
     } catch (err) {
         console.log(err);
     }

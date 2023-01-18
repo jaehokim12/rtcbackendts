@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
-import { friendAcceptDao } from '../../dao/friendAcceptDao';
-import { friendCheckUserDao } from '../../dao/friendCheckUserDao';
-import { invitedeleteDao } from '../../dao/invitedeleteDao';
+import { updateFriends } from '../../socketHandlers/updates/friends';
+import * as friendDao from '../../dao/friend';
 export const postAccept = async (req: Request, res: Response) => {
     try {
         console.log('req.body post accepet ::::', req.body);
         const { username } = req.body;
 
-        const senderId = req.user.userId; // 초대 받은 사람 수락 요청 하는사람
+        const senderId = req.user.userId; // 초대 받은 사람 수락 하는사람
         const receiverId = username; // 초대 한 사람 && 수락 받는 사람
         // 수락할 아이디
         // const invitation = await friendCheckUserDao(username);
@@ -18,11 +17,14 @@ export const postAccept = async (req: Request, res: Response) => {
         // }
         // const { senderId, receiverId } = invitation;
         // add friends to both users
-        const acceptSender = await friendAcceptDao(senderId, receiverId);
-        const acceptReceiver = await friendAcceptDao(receiverId, senderId);
-
-        const deleteInviteSender = await invitedeleteDao(senderId, receiverId);
-        const deleteInviteReceiver = await invitedeleteDao(receiverId, senderId);
+        const acceptSender = await friendDao.Accept(senderId, receiverId);
+        const acceptReceiver = await friendDao.Accept(receiverId, senderId);
+        // delete invite
+        const addFriendSender = await friendDao.addFriend(senderId, receiverId);
+        const addFriendReceiver = await friendDao.addFriend(receiverId, senderId);
+        await friendDao.deleteInvite(receiverId, senderId);
+        updateFriends(senderId);
+        updateFriends(receiverId);
         return res.status(200).send('Friend successfuly added');
     } catch (err) {
         console.log(err);

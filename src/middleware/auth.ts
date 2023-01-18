@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import * as express from 'express';
 
-const verifyToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+export const verifyToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let token = req.body.token || req.query.token || req.headers['authorization'];
 
     if (!token) {
@@ -18,5 +18,3 @@ const verifyToken = (req: express.Request, res: express.Response, next: express.
 
     return next();
 };
-
-export default verifyToken;

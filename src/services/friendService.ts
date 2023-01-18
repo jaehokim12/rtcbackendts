@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import * as database from '../database';
 
-import { friendDao } from '../dao/friendDao';
-
 export const friendService = async (req: Request, res: Response) => {
     try {
         const { mail, password } = req.body;

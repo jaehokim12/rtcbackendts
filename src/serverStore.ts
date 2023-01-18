@@ -11,13 +11,14 @@ export const getSocketServerInstance = () => {
 };
 
 export const addNewConnectedUser = ({ socketId, userId }: any) => {
+    connectedUsers.set(socketId, { userId });
     // socketId => socketio에서
     // userId => token 에서 userId
     // connectedUsers map 에 socketId : {userId} 로 저장
-    connectedUsers.set(socketId, { userId });
 };
 
-export const removeConnetedUser = (socketId: any) => {
+export const removeConnectedUser = (socketId: any) => {
+    console.log('removeConneted user', socketId);
     if (connectedUsers.has(socketId)) {
         connectedUsers.delete(socketId);
     }

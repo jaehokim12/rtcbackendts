@@ -1,0 +1,54 @@
+import * as database from '../database';
+import { Request, Response } from 'express';
+import { hash } from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import * as registerDao from '../dao/registerDao';
+interface UserInfo {
+    username: string;
+    mail: string;
+    password: string;
+}
+
+export const register = async (req: Request, res: Response) => {
+    console.log('register req', req.body);
+    try {
+        const { username, mail, password } = req.body as UserInfo;
+        let userExist = await registerDao.registerDao(mail);
+        console.log('userExist', userExist);
+        if (userExist) {
+            return res.status(200).send('already email exist');
+        }
+        const encryptedPassword = await hash(password, 10);
+        let result = await registerDao.registerDaoinsert({ username, mail, encryptedPassword });
+        console.log('result insert', result);
+        interface IUserDetails {
+            mail: string;
+            token: string;
+            username: string;
+        }
+        // let userDetail;
+        const token = jwt.sign(
+            {
+                userId: username,
+
+                mail,
+            },
+
+            `adfb!23`,
+
+            {
+                expiresIn: '24h',
+            },
+        );
+        console.log('token::::', token);
+        res.status(201).json({
+            userDetail: {
+                mail: mail,
+                token: token,
+                username: username,
+            },
+        });
+    } catch {
+        return res.status(500).send('Something went wrong. Please try again');
+    }
+};

@@ -10,7 +10,7 @@ interface UserInfos {
     username: string;
     encryptedPassword: string;
 }
-export const registerDao = async ({ mail }: UserInfo) => {
+export const registerDao = async (mail: any) => {
     let [result, _] = (await database.promisePool.query(`${registerQuery.findUser}`, [mail])) as RowDataPacket[];
     if (result !== undefined) {
         return result[0];
@@ -22,5 +22,5 @@ export const registerDao = async ({ mail }: UserInfo) => {
 export const registerDaoinsert = async ({ username, mail, encryptedPassword }: UserInfos) => {
     let result = await database.promisePool.query(`${registerQuery.insertUser}`, [username, mail, encryptedPassword]);
 
-    return result;
+    return result[0];
 };

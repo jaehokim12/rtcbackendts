@@ -130,7 +130,6 @@ export const checkFriend = async (userId: string, targetUser: string) => {
 export const friendList = async (userId: string) => {
     let [result]: any = await database.promisePool.query(`${friendQuery.friendList}`, [userId]);
     if (result !== undefined) {
-        console.log('friend list dao result', result);
         return result;
     } else {
         return null;
@@ -139,7 +138,6 @@ export const friendList = async (userId: string) => {
 export const deleteInvite = async (senderId: string, receiverId: string) => {
     let [result]: any = await database.promisePool.query(`${friendQuery.deleteInvite}`, [senderId, receiverId]);
     if (result !== undefined) {
-        console.log('friend list dao result', result[0]);
         return result[0];
     } else {
         return null;

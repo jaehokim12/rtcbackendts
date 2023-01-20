@@ -21,10 +21,6 @@ export const registerSocketServer = (server: any) => {
     });
 
     io.on('connection', (socket: any) => {
-        console.log('server', socket);
-        console.log('user connected');
-        console.log(socket.id);
-
         newConnectionHandler(socket, io);
         socket.on('disconnect', () => {
             disconnectHandler(socket);

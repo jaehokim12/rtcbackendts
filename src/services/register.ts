@@ -10,17 +10,16 @@ interface UserInfo {
 }
 
 export const register = async (req: Request, res: Response) => {
-    console.log('register req', req.body);
     try {
         const { username, mail, password } = req.body as UserInfo;
         let userExist = await registerDao.registerDao(mail);
-        console.log('userExist', userExist);
+
         if (userExist) {
             return res.status(200).send('already email exist');
         }
         const encryptedPassword = await hash(password, 10);
         let result = await registerDao.registerDaoinsert({ username, mail, encryptedPassword });
-        console.log('result insert', result);
+
         interface IUserDetails {
             mail: string;
             token: string;
@@ -40,7 +39,7 @@ export const register = async (req: Request, res: Response) => {
                 expiresIn: '24h',
             },
         );
-        console.log('token::::', token);
+
         res.status(201).json({
             userDetail: {
                 mail: mail,

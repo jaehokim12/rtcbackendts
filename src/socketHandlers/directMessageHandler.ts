@@ -6,8 +6,6 @@ export const directMessageHandler = async (datas: any) => {
 
         const io = getSocketServerInstance();
 
-        console.log('content:::', datas);
-
         io.emit('direct-message', datas);
     } catch (err) {
         console.log(err);

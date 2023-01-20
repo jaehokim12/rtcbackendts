@@ -2,8 +2,7 @@ import * as serverStore from '../serverStore';
 import { updateFriends, updateFriendsPendingInvitations } from './updates/friends';
 export const newConnectionHandler = async (socket: any, io: any) => {
     const userDetail = socket.user;
-    console.log('at new connect socket.user,', socket.user);
-    console.log('at new Connect userDetails.userId', userDetail.userId);
+
     serverStore.addNewConnectedUser({
         socketId: socket.id,
         userId: userDetail.userId,

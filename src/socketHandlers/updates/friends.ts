@@ -7,21 +7,14 @@ export const updateFriendsPendingInvitations = async (userId: any) => {
         // const result = await friendLastStateDao(userId);
         // console.log('result state', result);
 
-        // 불필요 수정
-        console.log('userId:::::::::::', userId);
         const pendingInvitations = (await friendDao.friendInviteListDao(userId)) as any;
         // 현재 보낸사람 반환 해줌 userId = 초대받은사람
         // pendingInvitations => sender list []
 
-        console.log('user invited lists :::: ', pendingInvitations);
         // find all active connections of specific userId
         // const receiverList = getActiveConnections(userId);
         // 초대받은 사람의 socket에서 연결 갯수
         if (pendingInvitations !== undefined) {
-            console.log('pendingInvitations !== undefined');
-
-            console.log('userid:::', userId);
-            console.log('pendingInvitations:::', pendingInvitations.sender);
             // receiverList.forEach((receiverSocketId: any) => {
             const receiverList = getActiveConnections(userId);
 
@@ -55,18 +48,16 @@ export const updateFriends = async (userId: any) => {
         // socket 중에서 친구 id 에게만 친구리스트 전달
         const receiverList = getActiveConnections(userId);
         const user = await friendDao.friendList(userId);
-        console.log('user at check friendList', user);
 
         if (receiverList.length > 0) {
             if (user) {
                 const friendsList = user.map((f: any) => {
-                    console.log('ffff', f);
                     return {
                         // mail: f.mail,
                         username: f.friendname,
                     };
                 });
-                console.log('friendsList::::', friendsList);
+
                 // get io server instance
                 const io = getSocketServerInstance();
 

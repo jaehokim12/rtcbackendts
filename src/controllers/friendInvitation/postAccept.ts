@@ -3,7 +3,6 @@ import { updateFriends } from '../../socketHandlers/updates/friends';
 import * as friendDao from '../../dao/friend';
 export const postAccept = async (req: Request, res: Response) => {
     try {
-        console.log('req.body post accepet ::::', req.body);
         const { username } = req.body;
 
         const senderId = req.user.userId; // 초대 받은 사람 수락 하는사람

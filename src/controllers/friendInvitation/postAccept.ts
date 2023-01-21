@@ -26,7 +26,6 @@ export const postAccept = async (req: Request, res: Response) => {
         updateFriends(receiverId);
         return res.status(200).send('Friend successfuly added');
     } catch (err) {
-        console.log(err);
         return res.status(500).send('Something went wrong. Please try again');
     }
 };

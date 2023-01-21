@@ -12,9 +12,8 @@ export const postInvite = async (req: Request, res: Response) => {
         }
         // todo find User tosenduser
         const targetUser = await friendDao.findTarget(targetMailAddress);
-        console.log('targetuser', targetUser);
+
         if (targetUser === undefined) {
-            // console.log('dfadsf');
             return res
                 .status(404)
                 .send(`Friend of ${targetMailAddress} has not been found. Please check mail address.`);

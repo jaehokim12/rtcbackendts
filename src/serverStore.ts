@@ -18,7 +18,6 @@ export const addNewConnectedUser = ({ socketId, userId }: any) => {
 };
 
 export const removeConnectedUser = (socketId: any) => {
-    console.log('removeConneted user', socketId);
     if (connectedUsers.has(socketId)) {
         connectedUsers.delete(socketId);
     }

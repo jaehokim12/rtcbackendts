@@ -47,7 +47,6 @@ export const Invite = async (receiver: string, sender: string) => {
     let [result]: any = await database.promisePool.query(`${friendQuery.insertInvite}`, [receiver, sender, `pending`]);
 
     if (result !== undefined) {
-        console.log('result as final insert invite', result);
         return result[0];
     } else {
         return null;
@@ -57,7 +56,7 @@ export const Invite = async (receiver: string, sender: string) => {
 export const friendInviteListDao = async (userId: string) => {
     // console.log('userid with invite user', userId, 'pending');
     let [result]: any = await database.promisePool.query(`${friendQuery.InviteList}`, [userId, 'pending']);
-    console.log('invite list result', result);
+
     if (result !== undefined) {
         return result[0];
     } else {
